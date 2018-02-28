@@ -10,10 +10,16 @@ sub new {
 	$this->{"flag_readg"} = $1;
 	$this->{"flag_writeg"} = $2;
 	$this->{"user"} = $3;
-	$this->{"file_group"} = $4;
-	$this->{"file_name"} = $directory eq "" ? $5 : $directory . "/" . $5;
+	$this->{"group"} = $4;
+	$this->{"name"} = $directory eq "" ? $5 : $directory . "/" . $5;
 
 	bless $this, $class; # pour rendre le hachage différent
+}
+
+sub get {
+	my ($this, $key) = @_;
+	
+	return $this->{$key};
 }
 
 sub display {
