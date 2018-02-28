@@ -3,9 +3,14 @@
 use strict;
 use warnings;
 
+# command line
 my $repertoire = @ARGV == 0 ? "." : $ARGV[0];
+
+# OS command
 my @set = `ls -lR $repertoire`;
 
+# OS to object
+my $directory = "";
 my %properties;
 
 foreach my $line(@set) {
@@ -18,10 +23,16 @@ foreach my $line(@set) {
 		$properties{"flag_writeg"} = $2;
 		$properties{"user"} = $3;
 		$properties{"file_group"} = $4;
-		$properties{"file_name"} = $5;
+		$properties{"file_name"} = $directory eq "" ? $5 : $directory . "/" . $5;
 	}
+	
+	if ($line =~ m/(.*):$/) {
+		$directory = $1;
+	}
+	
 }
 
+# OS display
 foreach my $key (keys(%properties)) {
    printf "%-30s : %s\n", $key, $properties{$key};
 }
