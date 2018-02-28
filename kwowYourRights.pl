@@ -31,8 +31,8 @@ foreach my $line(@set) {
 	# drwxr-xr-x.   7 ext-pdonzel wheel     4096  3 nov.   2016 xsl/
 	# -rw-rw-rw-. 1 progs       wheel      99318 27 fÃ©vr. 13:42 z6m39optj.sgm
 	# que signifie le deuxième mot
-	if ($line =~ m/^[d-]rw.(.)(.).{5}\s*\w\s*(\S*)\b\s*(\w*)\b.*\s*\b(.*)$/) {
-		my $systemFileMeta = SystemFileMeta->new($directory); # syntaxe du new		
+	if ($line =~ m/^[d-]rw.(.)(.).{5}\s*\w\s(\S*)\b\s*(\w*)\b.*\s(.*)$/) {		
+		my $systemFileMeta = SystemFileMeta->new($directory,$line); # syntaxe du new		
 		push @allFiles, $systemFileMeta; # ajout à une liste
 		next;
 	}
@@ -63,8 +63,7 @@ foreach my $systemFileMeta(@allFiles) {
 	# my $user = $systemFileMeta->get("user"); # la syntaxe imbriquée ne marche pas
 	# if (! grep( /^$user$/, @users))  { # exists dans une liste 		
 	my $group = $systemFileMeta->get("group");
-	if ($group ne "wheel") {
-		$systemFileMeta->display("");
+	if ($group ne "wheel") {		
 		push @otherGroup, $systemFileMeta;
 		next;
 	}	
@@ -89,14 +88,15 @@ foreach my $systemFileMeta(@groupNoWrite) {
 		$hdt{$user} = [];
 	}
 	
-	my @tableau = $hdt{$user};
+	my @tableau = @{$hdt{$user}};
 	
-	push @tableau, $systemFileMeta->get("name");
+	#push @tableau, $systemFileMeta->get("name");
+	push @tableau, "bla";
 }
 
 foreach my $user (keys(%hdt)) {
 	print "Fichier propriété de $user\n";
-	my @tableau = $hdt{$user};
+	my @tableau = @{$hdt{$user}};
 	foreach my $filename(@tableau) {
 		print $filename . "\n";
 	}
