@@ -64,6 +64,7 @@ foreach my $systemFileMeta(@allFiles) {
 	# if (! grep( /^$user$/, @users))  { # exists dans une liste 		
 	my $group = $systemFileMeta->get("group");
 	if ($group ne "wheel") {
+		$systemFileMeta->display("");
 		push @otherGroup, $systemFileMeta;
 		next;
 	}	
@@ -80,13 +81,27 @@ if ($#otherGroup != -1) {
 	}
 }
 
-if ($#groupNoWrite != -1) {
-	print "\n";
-	print "$#groupNoWrite fichiers sur lesquels le groupe wheel n'a pas tous les droits\n";
-	$command_line = "find $repertoire -exec chmod  g+w {} \\;";
-	print "changement des droits sur le répertoire : $command_line\n";
-	system($command_line);
+my %hdt;
 
+foreach my $systemFileMeta(@groupNoWrite) {
+	my $user = $systemFileMeta->get("user");
+	if (!exists $hdt{$user}) {
+		$hdt{$user} = [];
+	}
+	
+	my @tableau = $hdt{$user};
+	
+	push @tableau, $systemFileMeta->get("name");
 }
+
+foreach my $user (keys(%hdt)) {
+	print "Fichier propriété de $user\n";
+	my @tableau = $hdt{$user};
+	foreach my $filename(@tableau) {
+		print $filename . "\n";
+	}
+}
+
+
 
 
