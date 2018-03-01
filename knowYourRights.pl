@@ -88,10 +88,9 @@ foreach my $systemFileMeta(@groupNoWrite) {
 		$hdt{$user} = [];
 	}
 	
-	my @tableau = @{$hdt{$user}};
 	
-	#push @tableau, $systemFileMeta->get("name");
-	push @tableau, "bla";
+	#push @tableau, 
+	push @{$hdt{$user}}, $systemFileMeta->get("name");
 }
 
 foreach my $user (keys(%hdt)) {
