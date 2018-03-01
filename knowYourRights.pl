@@ -73,15 +73,33 @@ foreach my $systemFileMeta(@allFiles) {
 	}
 }
 
-if ($#otherGroup != -1) {
-	print scalar(@otherGroup) . " fichiers qui n'appartiennent pas au groupe wheel\n";
-	foreach my $systemFileMeta(@otherGroup) {
-		print $systemFileMeta->get('name') . " : " . $systemFileMeta->get('user') . "\n";
+# création d'un structure intermédiaire
+my %hdt;
+
+foreach my $systemFileMeta(@otherGroup) {
+	my $user = $systemFileMeta->get("user");
+	if (!exists $hdt{$user}) {
+		$hdt{$user} = [];
 	}
+	
+	push @{$hdt{$user}}, $systemFileMeta->get("name");
+}
+
+foreach my $user (keys(%hdt)) {		
+	my $outputFileName = "/u/ext-pdonzel/bin/var/osu-" . $user . ".sh";
+	open (my $outputFile, '>', $outputFileName) or die "Could not open file $outputFileName"; # ouvrir un fichier
+	print $outputFile "#!/bin/bash\n";	
+	my @tableau = @{$hdt{$user}};
+	foreach my $filename(@tableau) {
+		print $outputFile "chgrp wheel $filename ; chmod g+w $filename\n"; # écrire dans un fichier
+	}
+	close ($outputFile); # fermer un fichier
+	system ("chmod 755 $outputFileName");
+	print "Fichier à lancer : $outputFileName\n";
 }
 
 # création d'un structure intermédiaire
-my %hdt;
+%hdt = (); # clear my hash but i guess it's gonna memory leak
 
 foreach my $systemFileMeta(@groupNoWrite) {
 	my $user = $systemFileMeta->get("user");
@@ -95,13 +113,13 @@ foreach my $systemFileMeta(@groupNoWrite) {
 foreach my $user (keys(%hdt)) {		
 	my $outputFileName = "/u/ext-pdonzel/bin/var/su-" . $user . ".sh";
 	open (my $outputFile, '>', $outputFileName) or die "Could not open file $outputFileName"; # ouvrir un fichier
-	print $outputFile "#!/bin/bash";	
+	print $outputFile "#!/bin/bash\n";	
 	my @tableau = @{$hdt{$user}};
 	foreach my $filename(@tableau) {
-		print $outputFile "chmod g+w $filename . \n"; # écrire dans un fichier
+		print $outputFile "chmod g+w $filename\n"; # écrire dans un fichier
 	}
 	close ($outputFile); # fermer un fichier
-	system ("chmod u+x $outputFileName");
+	system ("chmod 755 $outputFileName");
 	print "Fichier à lancer : $outputFileName\n";
 }
 
