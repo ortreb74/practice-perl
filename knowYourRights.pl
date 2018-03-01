@@ -74,12 +74,13 @@ foreach my $systemFileMeta(@allFiles) {
 }
 
 if ($#otherGroup != -1) {
-	print "$#otherGroup fichiers qui n'appartiennent pas au groupe wheel\n";
+	print scalar(@otherGroup) . " fichiers qui n'appartiennent pas au groupe wheel\n";
 	foreach my $systemFileMeta(@otherGroup) {
-		print $systemFileMeta->get('name') . "\n";
+		print $systemFileMeta->get('name') . " : " . $systemFileMeta->get('user') . "\n";
 	}
 }
 
+# création d'un structure intermédiaire
 my %hdt;
 
 foreach my $systemFileMeta(@groupNoWrite) {
@@ -88,17 +89,20 @@ foreach my $systemFileMeta(@groupNoWrite) {
 		$hdt{$user} = [];
 	}
 	
-	
-	#push @tableau, 
 	push @{$hdt{$user}}, $systemFileMeta->get("name");
 }
 
-foreach my $user (keys(%hdt)) {
-	print "Fichier propriété de $user\n";
+foreach my $user (keys(%hdt)) {		
+	my $outputFileName = "/u/ext-pdonzel/bin/var/su-" . $user . ".sh";
+	open (my $outputFile, '>', $outputFileName) or die "Could not open file $outputFileName"; # ouvrir un fichier
+	print $outputFile "#!/bin/bash";	
 	my @tableau = @{$hdt{$user}};
 	foreach my $filename(@tableau) {
-		print $filename . "\n";
+		print $outputFile "chmod g+w $filename . \n"; # écrire dans un fichier
 	}
+	close ($outputFile); # fermer un fichier
+	system ("chmod u+x $outputFileName");
+	print "Fichier à lancer : $outputFileName\n";
 }
 
 
