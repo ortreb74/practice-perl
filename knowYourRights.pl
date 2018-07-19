@@ -31,7 +31,7 @@ foreach my $line(@set) {
 	# drwxr-xr-x.   7 ext-pdonzel wheel     4096  3 nov.   2016 xsl/
 	# -rw-rw-rw-. 1 progs       wheel      99318 27 fÃ©vr. 13:42 z6m39optj.sgm
 	# que signifie le deuxième mot
-	if ($line =~ m/^[d-]rw.(.)(.).{5}\s*\w\s(\S*)\b\s*(\w*)\b.*\s(.*)$/) {		
+	if ($line =~ m/^[d-]rw.(.)(.).{5}\s*\w\s(\S*)\b\s*(\w*)\b.*\d\s(.*)$/) {		
 		my $systemFileMeta = SystemFileMeta->new($directory,$line); # syntaxe du new		
 		push @allFiles, $systemFileMeta; # ajout à une liste
 		next;
@@ -42,14 +42,21 @@ foreach my $line(@set) {
 		next;		
 	}
 	
+	if ($line =~ m/^total.*/) {
+		# print "$directory : $line\n";		
+		next;		
+	}	
+	
+	# $type = "blank";
+	if ($line =~ /^\s*$/) {
+		next;
+	}
+	
 	print "$line\n";
 	
 }
 
 print "$#allFiles lignes interprétées comme des fichiers" . "\n";
-
-# my $systemFileMeta = pop @allFiles;
-# $systemFileMeta->display();
 
 # liste des fichiers non modifiables par un utilisateur donné du groupe des developpeurs ("wheel")
 
@@ -91,7 +98,7 @@ foreach my $user (keys(%hdt)) {
 	print $outputFile "#!/bin/bash\n";	
 	my @tableau = @{$hdt{$user}};
 	foreach my $filename(@tableau) {
-		print $outputFile "chgrp wheel $filename ; chmod g+w $filename\n"; # écrire dans un fichier
+		print $outputFile "chgrp wheel \"$filename\" ; chmod g+w \"$filename\"\n"; # écrire dans un fichier
 	}
 	close ($outputFile); # fermer un fichier
 	system ("chmod 755 $outputFileName");
