@@ -123,7 +123,7 @@ foreach my $user (keys(%hdt)) {
 	print $outputFile "#!/bin/bash\n";	
 	my @tableau = @{$hdt{$user}};
 	foreach my $filename(@tableau) {
-		print $outputFile "chmod g+w $filename\n"; # écrire dans un fichier
+		print $outputFile "chmod g+w \"$filename\"\n"; # écrire dans un fichier
 	}
 	close ($outputFile); # fermer un fichier
 	system ("chmod 755 $outputFileName");
